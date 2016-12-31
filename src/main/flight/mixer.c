@@ -816,6 +816,19 @@ void mixTable(void *pidProfilePtr)
             throttleMax = escAndServoConfig->maxthrottle;
             throttle = throttleMin = flight3DConfig->deadband3d_high;
         }
+    } else if (IS_RC_MODE_ACTIVE(BOXTURTLE)) {
+      // When active, scale the throttle from something like 1200 to 1141 or
+      // 1500 to 1088 or 1900 to 1017 (given a minthrottle/maxthrottle of 1150/2000).
+      // Borrowed from rosetta code "map range".
+      // FIXME: 1000 magic numbers.
+      throttle = escAndServoConfig->minthrottle +
+        (
+          ( rcCommand[THROTTLE] - escAndServoConfig->minthrottle ) *
+          ( 1000 - escAndServoConfig->minthrottle )
+        ) /
+        ( escAndServoConfig->maxthrottle - escAndServoConfig->minthrottle );
+      throttleMin = 1000;
+      throttleMax = escAndServoConfig->minthrottle; // 1150 == mincommand == minthrottle
     } else {
         throttle = rcCommand[THROTTLE];
         throttleMin = escAndServoConfig->minthrottle;
@@ -850,6 +863,7 @@ void mixTable(void *pidProfilePtr)
             } else {
                 motor[i] = constrain(motor[i], flight3DConfig->deadband3d_high, escAndServoConfig->maxthrottle);
             }
+        } else if (IS_RC_MODE_ACTIVE(BOXTURTLE)) {
         } else {
             motor[i] = constrain(motor[i], escAndServoConfig->minthrottle, escAndServoConfig->maxthrottle);
         }

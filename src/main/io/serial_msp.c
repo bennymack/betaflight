@@ -149,6 +149,7 @@ static const box_t boxes[CHECKBOX_ITEM_COUNT + 1] = {
     { BOXAIRMODE, "AIR MODE;", 28 },
     { BOX3DDISABLESWITCH, "DISABLE 3D SWITCH;", 29},
     { BOXFPVANGLEMIX, "FPV ANGLE MIX;", 30},
+    { BOXTURTLE, "TURTLE MODE;", 31},
     { CHECKBOX_ITEM_COUNT, NULL, 0xFF }
 };
 
@@ -543,6 +544,8 @@ void mspInit(serialConfig_t *serialConfig)
 	activeBoxIds[activeBoxIdCount++] = BOXOSD;
     }
 
+      activeBoxIds[activeBoxIdCount++] = BOXTURTLE;
+
 #ifdef TELEMETRY
     if (feature(FEATURE_TELEMETRY) && masterConfig.telemetryConfig.telemetry_switch) {
         activeBoxIds[activeBoxIdCount++] = BOXTELEMETRY;
@@ -600,7 +603,8 @@ static uint32_t packFlightModeFlags(void)
         IS_ENABLED(IS_RC_MODE_ACTIVE(BOXBLACKBOX)) << BOXBLACKBOX |
         IS_ENABLED(FLIGHT_MODE(FAILSAFE_MODE)) << BOXFAILSAFE |
         IS_ENABLED(IS_RC_MODE_ACTIVE(BOXAIRMODE)) << BOXAIRMODE |
-        IS_ENABLED(IS_RC_MODE_ACTIVE(BOXFPVANGLEMIX)) << BOXFPVANGLEMIX;
+        IS_ENABLED(IS_RC_MODE_ACTIVE(BOXFPVANGLEMIX)) << BOXFPVANGLEMIX |
+        IS_ENABLED(IS_RC_MODE_ACTIVE(BOXTURTLE)) << BOXTURTLE;
 
     for (i = 0; i < activeBoxIdCount; i++) {
         int flag = (tmp & (1 << activeBoxIds[i]));
